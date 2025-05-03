@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 public class Graph<E>{
     private boolean[][] edges; //edges[i][j] is true if there is a vertex from i to j
     private E[] labels; //labels[i] contains the label for vertex i
@@ -130,6 +132,51 @@ public class Graph<E>{
         return traversalOrder;
     } //end getBreadthFirstTraversal
 
+    //Performs depth-first search traversal on this Graph.
+    public QueueInterface<E> getDepthFirstTraversal(E origin){
+        visited = new boolean[labels.length];
+        resetVertices();
+
+        QueueInterface<E> traversalOrder = new LinkedQueue<>();
+        Stack<Integer> vertexStack = new Stack<>();
+
+        int originIndex = -1;
+        for (int i = 0; i < labels.length; i++) {
+        if (labels[i].equals(origin)) {
+            originIndex = i;
+            break;
+        }
+    }
+
+        if (originIndex == -1) {
+            return traversalOrder; // origin not found
+    }
+
+        visited[originIndex] = true;
+        traversalOrder.enqueue(origin);
+        vertexStack.push(originIndex);
+
+        while (!vertexStack.isEmpty()) {
+            int topIndex = vertexStack.peek(); // Peek without removing
+            boolean foundUnvisited = false;
+
+            for (int neighbor : neighbors(topIndex)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    traversalOrder.enqueue(labels[neighbor]);
+                    vertexStack.push(neighbor);
+                    foundUnvisited = true;
+                    break; // Important: go deeper
+            }
+        }
+
+            if (!foundUnvisited) {
+                vertexStack.pop(); // Backtrack
+        }
+    }
+
+        return traversalOrder;
+}
 
     public static void main(String[] args) {
         Graph<String> graph = new Graph<>(9);
@@ -160,8 +207,14 @@ public class Graph<E>{
         while(!breadthResult.isEmpty()){
             System.out.print(breadthResult.dequeue() + " ");
         } //end while
-
         System.out.println();
+
+        QueueInterface<String> depthResult = graph.getDepthFirstTraversal("A");
+        System.out.print("Depth-First Traversal Result: ");
+        while (!depthResult.isEmpty()) {
+            System.out.print(depthResult.dequeue() + " ");
+        }
+            System.out.println();
 
     } //end main
 
