@@ -167,16 +167,16 @@ public class Graph<E>{
                     vertexStack.push(neighbor);
                     foundUnvisited = true;
                     break; // Important: go deeper
+                }
             }
-        }
 
             if (!foundUnvisited) {
                 vertexStack.pop(); // Backtrack
+            }
         }
-    }
 
         return traversalOrder;
-}
+    }//end getDepthFirstTraversal
 
     public static void main(String[] args) {
         Graph<String> graph = new Graph<>(9);
