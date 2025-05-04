@@ -10,7 +10,7 @@ Roles/Contributions: Made interface, LinkedQueue class, Breadth-first traversal 
 Name: Gloriele Mendoza  
 Email: gcmendoza@cpp.edu  
 Git User: glorie16  
-Roles/Contributions: Depth-first traversal method  
+Roles/Contributions: Depth-first traversal method, methods to print bfs and dfs tree edges  
 
 Name: Josephine Villar  
 Email: jrvillar@cpp.edu  
