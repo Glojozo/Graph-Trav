@@ -89,7 +89,8 @@ public class Graph<E>{
        for(int i = 0; i < visited.length; i++){
         visited[i] = false;
        }
-    } //end restVertices
+   } //end restVertices
+    
 
     /**Performs a breadth-first search traversal on this Graph.
      * @return Queue of labels in the order they were visited.
@@ -177,6 +178,10 @@ public class Graph<E>{
 
         return traversalOrder;
     }//end getDepthFirstTraversal
+
+    public void printTreeEdges(E origin){
+        //add code here to print the edges of the tree formed by the traversal
+    }//end printTreeEdges
 
     public static void main(String[] args) {
         Graph<String> graph = new Graph<>(9);
