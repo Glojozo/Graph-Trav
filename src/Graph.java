@@ -1,10 +1,17 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 public class Graph<E>{
     private boolean[][] edges; //edges[i][j] is true if there is a vertex from i to j
     private E[] labels; //labels[i] contains the label for vertex i
     private boolean[] visited;
+    private int[] bfsParent;
+    private int[] dfsParent;
 
+    private List<String> bfsTreeEdges = new ArrayList<>();
+    private List<String> dfsTreeEdges = new ArrayList<>();
     /**Creates an empty Graph. */
     @SuppressWarnings("unchecked")
     public Graph(int n){
@@ -98,6 +105,10 @@ public class Graph<E>{
      */
     public QueueInterface<E> getBreadthFirstTraversal(E origin){
         visited = new boolean[labels.length];
+        bfsParent = new int[labels.length];
+        Arrays.fill(bfsParent, -1);
+        bfsTreeEdges.clear();
+
         resetVertices();
 
         QueueInterface<E> traversalOrder = new LinkedQueue<>();
@@ -124,8 +135,10 @@ public class Graph<E>{
             for(int neighbor : neighbors(frontIndex)){
                 if(!visited[neighbor]){
                     visited[neighbor] = true;
+                    bfsParent[neighbor] = frontIndex;
                     traversalOrder.enqueue(labels[neighbor]);
                     vertexQueue.enqueue(neighbor);
+                    bfsTreeEdges.add("(" + labels[frontIndex] + "," + labels[neighbor] + ")");
                 } //end if
             } //end for each
         } //end while
@@ -136,6 +149,11 @@ public class Graph<E>{
     //Performs depth-first search traversal on this Graph.
     public QueueInterface<E> getDepthFirstTraversal(E origin){
         visited = new boolean[labels.length];
+        dfsParent = new int[labels.length];
+        Arrays.fill(dfsParent, -1);
+        dfsTreeEdges.clear();
+
+
         resetVertices();
 
         QueueInterface<E> traversalOrder = new LinkedQueue<>();
@@ -164,9 +182,11 @@ public class Graph<E>{
             for (int neighbor : neighbors(topIndex)) {
                 if (!visited[neighbor]) {
                     visited[neighbor] = true;
+                    dfsParent[neighbor] = topIndex;
                     traversalOrder.enqueue(labels[neighbor]);
                     vertexStack.push(neighbor);
                     foundUnvisited = true;
+                    dfsTreeEdges.add("(" + labels[topIndex] + "," + labels[neighbor] + ")");
                     break; // Important: go deeper
                 }
             }
@@ -179,9 +199,24 @@ public class Graph<E>{
         return traversalOrder;
     }//end getDepthFirstTraversal
 
-    public void printTreeEdges(E origin){
-        //add code here to print the edges of the tree formed by the traversal
-    }//end printTreeEdges
+    public void printBFSTreeEdgesInOrder() {
+        System.out.print("BFS Tree edges: { ");
+        for (int i = 0; i < bfsTreeEdges.size(); i++) {
+            if (i > 0)
+                System.out.print(", ");
+            System.out.print(bfsTreeEdges.get(i));
+        }
+        System.out.println(" }");
+    }
+    
+    public void printDFSTreeEdgesInOrder() {
+        System.out.print("DFS Tree edges: { ");
+        for (int i = 0; i < dfsTreeEdges.size(); i++) {
+            if (i > 0) System.out.print(", ");
+            System.out.print(dfsTreeEdges.get(i));
+        }
+        System.out.println(" }");
+    }
 
     public static void main(String[] args) {
         Graph<String> graph = new Graph<>(9);
@@ -213,13 +248,16 @@ public class Graph<E>{
             System.out.print(breadthResult.dequeue() + " ");
         } //end while
         System.out.println();
+        graph.printBFSTreeEdgesInOrder();
+
 
         QueueInterface<String> depthResult = graph.getDepthFirstTraversal("A");
         System.out.print("Depth-First Traversal Result: ");
         while (!depthResult.isEmpty()) {
             System.out.print(depthResult.dequeue() + " ");
         }
-            System.out.println();
+        System.out.println();
+        graph.printDFSTreeEdgesInOrder();
 
     } //end main
 
