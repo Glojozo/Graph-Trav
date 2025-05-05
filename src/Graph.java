@@ -24,6 +24,7 @@ public class Graph<E>{
      * @param vertex integer correlating to the label.
      */
     public E getLabel(int vertex){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
         return labels[vertex];
     } //end getLabel
 
@@ -33,14 +34,27 @@ public class Graph<E>{
      * @param target integer where the edge points to.
      */
     public boolean isEdge(int source, int target){
+        checkVertexIndex(source); //Check if source is in bounds
+        checkVertexIndex(target); //Check if target is in bounds
         return edges[source][target];
     } //end isEdge
 
+    /* Checks if source/target is in bounds of Graph
+     * @param index integer index of the vertex
+     */ 
+    private void checkVertexIndex(int index) {
+        if (index < 0 || index >= labels.length) {
+            throw new IndexOutOfBoundsException("Invalid vertex index: " + index);
+        }
+    }
+    
     /**Adds an edge.
      * @param source integer where the edge starts.
      * @param target integer where the edge points to.
      */
     public void addEdge(int source, int target){
+        checkVertexIndex(source);
+        checkVertexIndex(target);
         edges[source][target] = true;
     } //end addEdge
 
@@ -49,6 +63,7 @@ public class Graph<E>{
      * @param vertex integer index of vertex in this Graph.
      */
     public int[] neighbors(int vertex){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
         int count = 0;
         int[] answer;
         
@@ -73,6 +88,8 @@ public class Graph<E>{
      * @param target integer where the edge ends.
      */
     public void removeEdge(int source, int target){
+        checkVertexIndex(source); //Check if source is in bounds
+        checkVertexIndex(target); //Check if target is in bounds
         edges[source][target] = false;
     } //end removeEdge
 
@@ -81,6 +98,11 @@ public class Graph<E>{
     * @param newLabel label to assign to the vertex.
     */
     public void setLabel(int vertex, E newLabel){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
+        if (newLabel == null) {
+            throw new IllegalArgumentException("Label cannot be null.");
+        }
+        
         labels[vertex] = newLabel;
     } //end setLabel
 
@@ -91,12 +113,15 @@ public class Graph<E>{
         return labels.length;
     } //end size
 
-    /**Resets the visited array */
+    /**Resets the visited array
+     * reset visited arrays to false
+    */
     public void resetVertices(){
-       for(int i = 0; i < visited.length; i++){
-        visited[i] = false;
+       if (visited == null) {
+        visited = new boolean[labels.length];
        }
-   } //end restVertices
+       Arrays.fill(visited, false);
+   } //end resetVertices
     
 
     /**Performs a breadth-first search traversal on this Graph.
@@ -122,9 +147,9 @@ public class Graph<E>{
             } //end if
         } //end for
 
-        if(originIndex == -1){
-            return traversalOrder; //origin not found
-        } //end if
+        if (originIndex == -1) {
+            throw new IllegalArgumentException("Label not found: " + origin);
+        }        
 
         visited[originIndex] = true;
         traversalOrder.enqueue(origin);
@@ -164,12 +189,12 @@ public class Graph<E>{
         if (labels[i].equals(origin)) {
             originIndex = i;
             break;
+            }
         }
-    }
 
         if (originIndex == -1) {
-            return traversalOrder; // origin not found
-    }
+            throw new IllegalArgumentException("Label not found: " + origin);
+        }
 
         visited[originIndex] = true;
         traversalOrder.enqueue(origin);
