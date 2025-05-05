@@ -1,10 +1,17 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 public class Graph<E>{
     private boolean[][] edges; //edges[i][j] is true if there is a vertex from i to j
     private E[] labels; //labels[i] contains the label for vertex i
     private boolean[] visited;
+    private int[] bfsParent;
+    private int[] dfsParent;
 
+    private List<String> bfsTreeEdges = new ArrayList<>();
+    private List<String> dfsTreeEdges = new ArrayList<>();
     /**Creates an empty Graph. */
     @SuppressWarnings("unchecked")
     public Graph(int n){
@@ -17,6 +24,7 @@ public class Graph<E>{
      * @param vertex integer correlating to the label.
      */
     public E getLabel(int vertex){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
         return labels[vertex];
     } //end getLabel
 
@@ -26,14 +34,27 @@ public class Graph<E>{
      * @param target integer where the edge points to.
      */
     public boolean isEdge(int source, int target){
+        checkVertexIndex(source); //Check if source is in bounds
+        checkVertexIndex(target); //Check if target is in bounds
         return edges[source][target];
     } //end isEdge
 
+    /* Checks if source/target is in bounds of Graph
+     * @param index integer index of the vertex
+     */ 
+    private void checkVertexIndex(int index) {
+        if (index < 0 || index >= labels.length) {
+            throw new IndexOutOfBoundsException("Invalid vertex index: " + index);
+        }
+    }
+    
     /**Adds an edge.
      * @param source integer where the edge starts.
      * @param target integer where the edge points to.
      */
     public void addEdge(int source, int target){
+        checkVertexIndex(source);
+        checkVertexIndex(target);
         edges[source][target] = true;
     } //end addEdge
 
@@ -42,6 +63,7 @@ public class Graph<E>{
      * @param vertex integer index of vertex in this Graph.
      */
     public int[] neighbors(int vertex){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
         int count = 0;
         int[] answer;
         
@@ -66,6 +88,8 @@ public class Graph<E>{
      * @param target integer where the edge ends.
      */
     public void removeEdge(int source, int target){
+        checkVertexIndex(source); //Check if source is in bounds
+        checkVertexIndex(target); //Check if target is in bounds
         edges[source][target] = false;
     } //end removeEdge
 
@@ -74,6 +98,11 @@ public class Graph<E>{
     * @param newLabel label to assign to the vertex.
     */
     public void setLabel(int vertex, E newLabel){
+        checkVertexIndex(vertex); //Check if vertex is in bounds
+        if (newLabel == null) {
+            throw new IllegalArgumentException("Label cannot be null.");
+        }
+        
         labels[vertex] = newLabel;
     } //end setLabel
 
@@ -84,12 +113,15 @@ public class Graph<E>{
         return labels.length;
     } //end size
 
-    /**Resets the visited array */
+    /**Resets the visited array
+     * reset visited arrays to false
+    */
     public void resetVertices(){
-       for(int i = 0; i < visited.length; i++){
-        visited[i] = false;
+       if (visited == null) {
+        visited = new boolean[labels.length];
        }
-   } //end restVertices
+       Arrays.fill(visited, false);
+   } //end resetVertices
     
 
     /**Performs a breadth-first search traversal on this Graph.
@@ -98,6 +130,10 @@ public class Graph<E>{
      */
     public QueueInterface<E> getBreadthFirstTraversal(E origin){
         visited = new boolean[labels.length];
+        bfsParent = new int[labels.length];
+        Arrays.fill(bfsParent, -1);
+        bfsTreeEdges.clear();
+
         resetVertices();
 
         QueueInterface<E> traversalOrder = new LinkedQueue<>();
@@ -111,9 +147,9 @@ public class Graph<E>{
             } //end if
         } //end for
 
-        if(originIndex == -1){
-            return traversalOrder; //origin not found
-        } //end if
+        if (originIndex == -1) {
+            throw new IllegalArgumentException("Label not found: " + origin);
+        }        
 
         visited[originIndex] = true;
         traversalOrder.enqueue(origin);
@@ -124,8 +160,10 @@ public class Graph<E>{
             for(int neighbor : neighbors(frontIndex)){
                 if(!visited[neighbor]){
                     visited[neighbor] = true;
+                    bfsParent[neighbor] = frontIndex;
                     traversalOrder.enqueue(labels[neighbor]);
                     vertexQueue.enqueue(neighbor);
+                    bfsTreeEdges.add("(" + labels[frontIndex] + "," + labels[neighbor] + ")");
                 } //end if
             } //end for each
         } //end while
@@ -136,6 +174,11 @@ public class Graph<E>{
     //Performs depth-first search traversal on this Graph.
     public QueueInterface<E> getDepthFirstTraversal(E origin){
         visited = new boolean[labels.length];
+        dfsParent = new int[labels.length];
+        Arrays.fill(dfsParent, -1);
+        dfsTreeEdges.clear();
+
+
         resetVertices();
 
         QueueInterface<E> traversalOrder = new LinkedQueue<>();
@@ -146,12 +189,12 @@ public class Graph<E>{
         if (labels[i].equals(origin)) {
             originIndex = i;
             break;
+            }
         }
-    }
 
         if (originIndex == -1) {
-            return traversalOrder; // origin not found
-    }
+            throw new IllegalArgumentException("Label not found: " + origin);
+        }
 
         visited[originIndex] = true;
         traversalOrder.enqueue(origin);
@@ -164,9 +207,11 @@ public class Graph<E>{
             for (int neighbor : neighbors(topIndex)) {
                 if (!visited[neighbor]) {
                     visited[neighbor] = true;
+                    dfsParent[neighbor] = topIndex;
                     traversalOrder.enqueue(labels[neighbor]);
                     vertexStack.push(neighbor);
                     foundUnvisited = true;
+                    dfsTreeEdges.add("(" + labels[topIndex] + "," + labels[neighbor] + ")");
                     break; // Important: go deeper
                 }
             }
@@ -179,9 +224,24 @@ public class Graph<E>{
         return traversalOrder;
     }//end getDepthFirstTraversal
 
-    public void printTreeEdges(E origin){
-        //add code here to print the edges of the tree formed by the traversal
-    }//end printTreeEdges
+    public void printBFSTreeEdgesInOrder() {
+        System.out.print("BFS Tree edges: { ");
+        for (int i = 0; i < bfsTreeEdges.size(); i++) {
+            if (i > 0)
+                System.out.print(", ");
+            System.out.print(bfsTreeEdges.get(i));
+        }
+        System.out.println(" }");
+    }
+    
+    public void printDFSTreeEdgesInOrder() {
+        System.out.print("DFS Tree edges: { ");
+        for (int i = 0; i < dfsTreeEdges.size(); i++) {
+            if (i > 0) System.out.print(", ");
+            System.out.print(dfsTreeEdges.get(i));
+        }
+        System.out.println(" }");
+    }
 
     public static void main(String[] args) {
         Graph<String> graph = new Graph<>(9);
@@ -213,13 +273,16 @@ public class Graph<E>{
             System.out.print(breadthResult.dequeue() + " ");
         } //end while
         System.out.println();
+        graph.printBFSTreeEdgesInOrder();
+
 
         QueueInterface<String> depthResult = graph.getDepthFirstTraversal("A");
         System.out.print("Depth-First Traversal Result: ");
         while (!depthResult.isEmpty()) {
             System.out.print(depthResult.dequeue() + " ");
         }
-            System.out.println();
+        System.out.println();
+        graph.printDFSTreeEdgesInOrder();
 
     } //end main
 
