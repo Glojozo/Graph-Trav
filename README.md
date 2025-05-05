@@ -15,6 +15,11 @@ Roles/Contributions: Depth-first traversal method, methods to print bfs and dfs 
 Name: Josephine Villar  
 Email: jrvillar@cpp.edu  
 Git User: jo-seashell  
-Roles/Contributions:  
+Roles/Contributions: Graph Exceptions, GraphTest.java, JUnit testing
+
+Note:
+- Only includes adjacency list graph represenation
+- Includes JUnit testing
 
 Github Repo Link: (https://github.com/Glojozo/Graph-Trav.git)
+
