@@ -18,7 +18,7 @@ Git User: jo-seashell
 Roles/Contributions: Graph Exceptions, GraphTest.java, JUnit testing
 
 Note:
-- Only includes adjacency list graph represenation
+- Only includes adjacency list graph representation
 - Includes JUnit testing
 
 Github Repo Link: (https://github.com/Glojozo/Graph-Trav.git)
